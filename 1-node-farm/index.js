@@ -1,54 +1,52 @@
-const fs = require('fs');
-const http =  require('http')
-const url  = require('url')
+const fs = require('fs')
+const http = require('http')
+const url = require('url')
 
-///////// FILE
-// //sync
-// const textIn = fs.readFileSync('./starter/txt/input.txt', 'utf-8');
-// console.log(textIn)
-// const textOut = `This is: ${textIn}`
-// fs.writeFileSync('./starter/txt/output.txt', textOut)
+const slugify = require('slugify')
+const replaceTemplate = require('./modules/replaceTemplate')
 
-// //async
-// fs.readFile('./starter/txt/start.txt', 'utf-8', (err, data1) => {
-//     fs.readFile(`./starter/txt/${data1}.txt`, 'utf-8', (err, data2) => {
-//         console.log(data2)
-//         fs.readFile(`./starter/txt/append.txt`, 'utf-8',(err, data3) => {
-//             console.log(data3)
-//             fs.writeFile('./starter/txt/final.txt', `${data2}\n${data3}`, 'utf-8', err => {
-//                 console.log('OK')
-//             })
-//         })
-//     })
-// })
+// [Moriah] readFileSync在這裡只會執行一次
+const tempOverview = fs.readFileSync(`${__dirname}/final/templates/template-overview.html`, 'utf-8')
+const tempCard = fs.readFileSync(`${__dirname}/final/templates/template-card.html`, 'utf-8')
+const tempProduct = fs.readFileSync(`${__dirname}/final/templates/template-product.html`, 'utf-8')
 
-//////// SERVER
-// [Moriah] 在這裡只會執行一次
-const data = fs.readFileSync(`${__dirname}/starter/dev-data/data.json`, 'utf-8')
+const data = fs.readFileSync(`${__dirname}/final/dev-data/data.json`, 'utf-8')
 const dataObj = JSON.parse(data)
+const slugs = dataObj.map(el => slugify(el.productName, { lower: true }))
+console.log(slugs)
 
 const server = http.createServer((req, res) => {
-    const pathName = req.url
-    // Overview Page
-    if(pathName ==='/' || pathName === '/overview') {
 
-        
-        res.end('This is the OVERVIEW.')
-    
-    // Product page
-    } else if(pathName === '/product') {
-        res.end('This is the PRODUCT')
-    
-    // API 
-    } else if(pathName === '/api') {
+    const { query, pathname } = url.parse(req.url, true)  //解析url變量
+
+    // Overview Page
+    if (pathname === '/' || pathname === '/overview') {
+        res.writeHead(200, { 'Content-type': 'text/html' })
+
+        // [Moriah] 字符(place holder)替換
+        // replaceTemplate接收tempCard的Html
+        const cardsHtml = dataObj.map(el => replaceTemplate(tempCard, el)).join('') //全部連接成一個大字串
+        const output = tempOverview.replace('{%PRODUCT_CARDS%}', cardsHtml)
+        res.end(output)
+
+        // Product page
+    } else if (pathname === '/product') {
+        res.writeHead(200, { 'Content-type': 'text/html' })
+        const product = dataObj[query.id]
+        const output = replaceTemplate(tempProduct, product)
+
+        res.end(output)
+
+        // API 
+    } else if (pathname === '/api') {
         // [Moriah] readFile在這裡每次都會被讀取
         // fs.readFile(`${__dirname}/starter/dev-data/data.json`, 'utf-8', (err, data) => {
         //     const productData = JSON.parse(data)
-             res.writeHead(200, {'Content-type': 'application/json'})
-             res.end(data)
+        res.writeHead(200, { 'Content-type': 'application/json' })
+        res.end(data)
         // })
-    
-    // Not Found
+
+        // Not Found
     } else {
         res.writeHead(404, {
             'Content-type': 'text/html',
