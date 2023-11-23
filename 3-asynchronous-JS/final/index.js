@@ -10,38 +10,53 @@ const readFilePro = file => {
   });
 };
 
-readFilePro()
+const writeFilePro = (file, data) => {
+  return new Promise((resolve, reject) => {
+    fs.writeFile(file, data, err => {
+      if (err) reject('Could not write file.')
+      resolve('sucess')
+    })
+  })
+}
 
-// [Moriah] callback hell
-fs.readFile(`${__dirname}/dog.txt`, (err, data) => {
-  console.log(`Breed: ${data}`)
-
-  // [Moriah] then: 在promise完成工作並返回數據時被調用
-  superagent
-  .get(`https://dog.ceo/api/breed/${data}/images/random`)
+readFilePro(`${__dirname}/dog.txt`)
+  .then(data => {
+    console.log(`Breed: ${data}`)
+    return superagent.get(`https://dog.ceo/api/breed/${data}/images/random`) // [Moriah] get會return一個promise
+  })
   .then(res => {
     console.log(res.body.message)
-
-    fs.writeFile('dog-mimg.txt', res.body.message, err => {
-      if (err) return console.log(err.message)
-      console.log('Random dog image saved to file!')
-     })
-  }).carch(err => {
-    console.log(err.message)
+    return writeFilePro('dog-img.txt', res.body.message)
+    // fs.writeFile('dog-img.txt', res.body.message, err => {
+    //   if (err) return console.log(err.message)
+    //   console.log('Random dog image saved to file!')
+    //  })
   })
-})
+  .then(() => {
+    console.log('Random dog image saved to file!')
+  })
+  .catch(err => {
+    console.log(err)
+  })
 
+// [Moriah] callback hell
+// fs.readFile(`${__dirname}/dog.txt`, (err, data) => {
+//   console.log(`Breed: ${data}`)
 
+//   // [Moriah] then: 在promise完成工作並返回數據時被調用
+//   superagent
+//   .get(`https://dog.ceo/api/breed/${data}/images/random`)
+//   .then(res => {
+//     console.log(res.body.message)
 
-
-// const writeFilePro = (file, data) => {
-//   return new Promise((resolve, reject) => {
-//     fs.writeFile(file, data, err => {
-//       if (err) reject('Could not write file 😢');
-//       resolve('success');
-//     });
-//   });
-// };
+//     fs.writeFile('dog-mimg.txt', res.body.message, err => {
+//       if (err) return console.log(err.message)
+//       console.log('Random dog image saved to file!')
+//      })
+//   }).carch(err => {
+//     console.log(err.message)
+//   })
+// })
 
 // const getDogPic = async () => {
 //   try {
