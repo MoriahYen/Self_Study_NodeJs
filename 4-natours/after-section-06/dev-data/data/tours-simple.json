@@ -219,33 +219,9 @@
     "difficulty": "easy"
   },
   {
-    "id": 11,
-    "name": "Test Tour 2",
-    "duration": 5,
-    "difficulty": "easy"
+    "id": 11
   },
   {
     "id": 12
-  },
-  {
-    "id": 13
-  },
-  {
-    "id": 14
-  },
-  {
-    "id": 15
-  },
-  {
-    "id": 16
-  },
-  {
-    "id": 17
-  },
-  {
-    "id": 18
-  },
-  {
-    "id": 19
   }
 ]

@@ -28,7 +28,7 @@ app.get('/api/v1/tours', (req, res) => {
   })
 })
 
-app.get('/api/v1/tour/:id', (req, res) => {
+app.get('/api/v1/tours/:id', (req, res) => {
   console.log(req.params)
   const id = req.params.id * 1  // [Moriah] 轉換為數字
   const tour = tours.find(el => el.id === id)
@@ -64,6 +64,22 @@ app.post('/api/v1/tours', (req, res) => {
         tour: newTour
       }
     })
+  })
+})
+
+app.patch('/api/v1/tours/:id', (req, res) => {
+  if(req.params.id * 1 > tours.length) {
+      return res.status(404).JSON({
+        status: 'fail',
+        message: 'Invalid ID'
+      })
+    }
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      tour: '<Updated tour here...>'
+    }
   })
 })
 
