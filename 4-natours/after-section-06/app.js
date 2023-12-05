@@ -28,11 +28,33 @@ app.get('/api/v1/tours', (req, res) => {
   })
 })
 
+app.get('/api/v1/tour/:id', (req, res) => {
+  console.log(req.params)
+  const id = req.params.id * 1  // [Moriah] 轉換為數字
+  const tour = tours.find(el => el.id === id)
+
+  //if(id > tour.length) {
+  if (!tour) {
+    return res.status(404).JSON({
+      status: 'fail',
+      message: 'Invalid ID'
+    })
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      tour
+    }
+  })
+})
+
 app.post('/api/v1/tours', (req, res) => {
- // console.log(req.body)
-  
+  //  console.log(req.body)
+
   const newId = tours[tours.length - 1].id + 1
-  const newTour = Object.assign({id: newId}, req.body)  // [Moriah]: assign>>將兩個obj合成一個新的obj
+  // [Moriah] Can't merge, why?
+  const newTour = Object.assign({ id: newId }, req.body)  // [Moriah]: assign>>將兩個obj合成一個新的obj
 
   tours.push(newTour)
   fs.writeFile(`${__dirname}/dev-data/data/tours-simple.json`, JSON.stringify(tours), err => {
