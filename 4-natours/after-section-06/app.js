@@ -7,9 +7,12 @@ const userRouter = require('./routes/userRoutes')
 const app = express();
 
 /* 1. MIDDLEWARE */
-app.use(morgan('dev'))
-
+if(process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'))
+}
 app.use(express.json())  // [Moriah] 要有這個assign才能merge
+
+app.use(express.static(`${__dirname}/public`))
 
 // [Moriah] define middleware
 app.use((req, res, next) => {
