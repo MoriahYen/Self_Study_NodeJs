@@ -33,6 +33,19 @@ const tourSchema = new mongoose.Schema({
 // [Moriah] model name/params 用大寫
 const Tour = mongoose.model('Tour', tourSchema)
 
+const testTour = new Tour({
+  name: 'The Forest Hiker',  // [Moriah] 用相同名稱儲存會報錯
+  rating: 4.7,
+  price: 497
+})
+
+// [Moriah] saved to DB, return a promise
+testTour.save().then(doc => {
+  console.log(doc)
+}).catch(err => {
+  console.log('ERROR!', err)
+})
+
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`App running on port ${port}...`);
