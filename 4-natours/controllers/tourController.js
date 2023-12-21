@@ -4,21 +4,30 @@ exports.getAllTours = async (req, res) => {
   try {
     console.log(req.query)
     // BULID QUERY
-    // 1) filtering
+    // 1A) filtering
 
     // [Moriah] ...: 創造一結構，把所有的field從obj提出來(?)
     const queryObj = {...req.query}
     const excludedFields = ['page', 'sort', 'limit', 'fields']
     excludedFields.forEach (el => delete queryObj[el])
 
-    // 2) Advanced filtering
+    // 1B) Advanced filtering
     let queryStr = JSON.stringify(queryObj)
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`) // [Moriah] regular expression
-    console.log(JSON.parse(queryStr))
     // [Moriah] hard coding
     // return a query
-    const query = Tour.find(JSON.parse(queryStr))
+    let query = Tour.find(JSON.parse(queryStr))
     // const tours = await Tour.find().where('duration').equals('5').where('difficulty').equals('easy')
+
+    // 2) Sorting
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(',').join(' ')
+      query = query.sort(sortBy)
+      // sort('price ratingsAverage')
+    } else {
+      query = query.sort('-createdAt')
+    }
+
 
     // EXECUTE QUERY
     const tours =  await query
