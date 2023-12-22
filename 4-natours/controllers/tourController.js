@@ -1,5 +1,13 @@
 const Tour = require('./../models/tourModel')
 
+exports.aliasTopTours = (req, res, next) => {
+  // limit=5&sort=-ratingsAverage,price
+  req.query.limit = '5'
+  req.query.sort = '-ratingsAverage,price'
+  req.query.fields = 'name,price,ratingsAverage,summery,difficulty'
+  next()
+}
+
 exports.getAllTours = async (req, res) => {
   try {
     console.log(req.query)
@@ -21,7 +29,7 @@ exports.getAllTours = async (req, res) => {
 
     // 2) Sorting
     if (req.query.sort) {
-      const sortBy = req.query.sort.split(',').join(' ')
+      const sortBy = req.query.sort.split(',').join(' ')  // [Moriah] join好像不成功??
       query = query.sort(sortBy)
       // sort('price ratingsAverage')
     } else {
