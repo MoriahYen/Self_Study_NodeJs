@@ -12,7 +12,7 @@ exports.aliasTopTours = (req, res, next) => {
 exports.getAllTours = async (req, res) => {
   try {
     // EXECUTE QUERY
-    const features = new APTFeatures(Tour.find(), req.query)
+    const features = new APIFeatures(Tour.find(), req.query)
       .filter()
       .sort()
       .limitFields()
@@ -146,6 +146,59 @@ exports.getTourStats = async(req, res) => {
       status: 'success',
       data: {
         stats
+      }
+    })
+  } catch(err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err
+    })
+  }
+}
+
+exports.getMonthlyPlan = async (req, res) => {
+  try {
+    const year = req.params.year * 1
+
+    const plan =  await Tour.aggregate([
+      {
+        // [Moriah] unwind: 從檔案中解構一個數組字段，再為數組的每個元素輸出一個文檔
+        // ex: The Forest Hiker有三個日期，所以分成三個文檔
+        $unwind: '$startDates'
+      },
+      {
+        // [Moriah] match用來選擇文檔
+        $match: {
+          startDates: {
+            $gte: new Date(`${year}-01-01`),
+            $lte: new Date(`${year}-12-31`)
+          }
+        }
+      },
+      {
+        $group: {
+          _id: {$month: '$startDates'},
+          numTourStarts: {$sum: 1},
+          tours: {$push: '$name'}
+        }
+      },
+      {
+        $addFields: {month: '$_id'}
+      },
+      {
+        $project: {_id: 0}
+      },
+      {
+        $sort: {numTourStarts: -1}
+      },
+      {
+        $limit: 12
+      }
+    ])
+    res.status(200).json({
+      status: 'success',
+      data: {
+        plan
       }
     })
   } catch(err) {
