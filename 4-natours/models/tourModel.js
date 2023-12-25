@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 
-const tourSchema = new mongoose.Schema({
+const tourSchema = new mongoose.Schema(
+  {
     name: {
       type: String,
       required: [true, 'A tour must have a name'],
@@ -70,6 +71,17 @@ const tourSchema = new mongoose.Schema({
       type: Boolean,
       default: false
     }
+},
+{
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
+}
+)
+
+// [Moriah] virtual property: 不會永久存在DB
+// 不用箭頭函數，因為箭頭函數不能用this
+tourSchema.virtual('durationWeeks').get(function() {
+  return this.duration / 7
 })
 
 const Tour = mongoose.model('Tour', tourSchema)
