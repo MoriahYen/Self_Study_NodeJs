@@ -104,6 +104,22 @@ tourSchema.pre('save', function(next) {
 //   next()
 // })
 
+// QUERY MIDDLEWARE
+// tourSchema.pre('find', function(next) {
+// [Moriah] included strings startd with find(): find(), findOne(), findOneAndDelete()...
+tourSchema.pre(/^find/, function(next) {
+  this.find({secretTour: {$ne: true}})
+
+  this.strat = Date.now()
+  next()
+})
+
+tourSchema.post(/^find/, function(docs, next) {
+  console.log(`Query took ${Date.now() - this.strat} milliseconds`)
+  console.log(docs)
+  next()
+})
+
 const Tour = mongoose.model('Tour', tourSchema)
 
 module.exports = Tour
