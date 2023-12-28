@@ -5,7 +5,7 @@ exports.aliasTopTours = (req, res, next) => {
   // limit=5&sort=-ratingsAverage,price
   req.query.limit = '5'
   req.query.sort = '-ratingsAverage,price'
-  req.query.fields = 'name,price,ratingsAverage,summery,difficulty'
+  req.query.fields = 'name,price,ratingsAverage,summary,difficulty'
   next()
 }
 
@@ -17,8 +17,8 @@ exports.getAllTours = async (req, res) => {
       .sort()
       .limitFields()
       .paginate()
-    
-    const tours =  await features.query
+
+    const tours = await features.query
 
     // SEND RESPONSE
     res.status(200).json({
