@@ -1,7 +1,7 @@
-const AppError = require('../utils/appError')
 const Tour = require('./../models/tourModel')
 const APIFeatures = require('./../utils/apiFeatures')
 const catchAsync = require('./../utils/catchAsync')
+const AppError = require('./../utils/appError')
 
 exports.aliasTopTours = (req, res, next) => {
   // limit=5&sort=-ratingsAverage,price
@@ -41,7 +41,7 @@ exports.getTour = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    message: {
+    data: {
       tour
     }
   })
