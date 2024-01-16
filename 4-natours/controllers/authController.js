@@ -11,11 +11,14 @@ const signToken = id => {
 }
 
 exports.signup = catchAsync(async (req, res, next) => {
+  // [Moriah] 這邊有bug, postman不能在body擴充
   const newUser = await User.create({
     name: req.body.name,
     email: req.body.email,
     password: req.body.password,
-    passwordConfirm: req.body.passwordConfirm
+    passwordConfirm: req.body.passwordConfirm,
+    passwordChangedAt: req.body.passwordChangedAt,
+    role: req.body.role
   })
 
   const token = signToken(newUser._id)
@@ -62,7 +65,6 @@ exports.protect = catchAsync(async (req, res, next) => {
   ) {
     token = req.headers.authorization.split(' ')[1]
   }
-  console.log(token)
 
   if (!token) {
     return next(
