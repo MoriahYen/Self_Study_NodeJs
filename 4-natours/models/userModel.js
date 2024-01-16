@@ -57,6 +57,14 @@ userSchema.pre('save', async function(next) {
   next()
 })
 
+userSchema.pre('save', function(next) {
+  if (!this.isModified('password') || this.isNew) return next()
+
+  // [Moriah] 有時候JWT會在改密碼前先創建，故減1s
+  this.passwordChangedAt = Date.now() - 1000
+  next()
+})
+
 userSchema.methods.correctPassword = async function(
   candidatePassword,
   userPassword
