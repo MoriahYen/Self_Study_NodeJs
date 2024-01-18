@@ -40,7 +40,12 @@ const userSchema = new mongoose.Schema({
   },
   passwordChangedAt: Date,
   passwordResetToken: String,
-  passwordResetExpires: Date
+  passwordResetExpires: Date,
+  active: {
+    type: Boolean,
+    default: true,
+    select: false
+  }
 })
 
 // [Moriah] pre save middleware
@@ -62,6 +67,14 @@ userSchema.pre('save', function(next) {
 
   // [Moriah] 有時候JWT會在改密碼前先創建，故減1s
   this.passwordChangedAt = Date.now() - 1000
+  next()
+})
+
+// [Moriah] query middleware
+// /^find/: findOne, findById...
+userSchema.pre(/^find/, function(next) {
+  // this points to the current query
+  this.find({ active: { $ne: false } })
   next()
 })
 
