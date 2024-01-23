@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const slugify = require('slugify')
+const User = require('./userModel')
 //const validator = require('validator')
 
 const tourSchema = new mongoose.Schema(
@@ -49,7 +50,7 @@ const tourSchema = new mongoose.Schema(
       validate: {
         validator: function(val) {
           // this only points to current doc on NEW document creation
-          return val < this.price;
+          return val < this.price
         },
         message: 'Discount price ({VALUE}) should be below regular price'
       }
@@ -111,10 +112,10 @@ const tourSchema = new mongoose.Schema(
       }
     ]
   },
-{
-  toJSON: { virtuals: true },
-  toObject: { virtuals: true }
-}
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
+  }
 )
 
 // [Moriah] virtual property: 不會永久存在DB
@@ -126,7 +127,13 @@ tourSchema.virtual('durationWeeks').get(function() {
 // DOCUMENT MIDDLEWARE: runs before .save() and .create() .insertMany
 // [Moriah] pre save hook(?)
 tourSchema.pre('save', function(next) {
-  this.slug = slugify(this.name, {lower: true})
+  this.slug = slugify(this.name, { lower: true })
+  next()
+})
+
+tourSchema.pre('save', async function(next) {
+  const guidesPromises = this.guides.map(async id => await User.findById(id))
+  this.guides = await Promise.all(guidesPromises)
   next()
 })
 
@@ -145,7 +152,7 @@ tourSchema.pre('save', function(next) {
 // tourSchema.pre('find', function(next) {
 // [Moriah] included strings startd with find(): find(), findOne(), findOneAndDelete()...
 tourSchema.pre(/^find/, function(next) {
-  this.find({secretTour: {$ne: true}})
+  this.find({ secretTour: { $ne: true } })
 
   this.strat = Date.now()
   next()
@@ -158,12 +165,11 @@ tourSchema.post(/^find/, function(docs, next) {
 
 // AAGREGATION MIDDLEWARE
 tourSchema.pre('aggregate', function(next) {
-  this.pipeline().unshift({$match: {secretTour: {$ne: true}}})
+  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } })
 
   console.log(this.pipeline())
   next()
 })
-
 
 const Tour = mongoose.model('Tour', tourSchema)
 
