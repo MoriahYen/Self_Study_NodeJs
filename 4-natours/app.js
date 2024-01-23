@@ -4,6 +4,7 @@ const rateLimit = require('express-rate-limit')
 const helmet = require('helmet')
 const mongoSanitize = require('express-mongo-sanitize')
 const xss = require('xss-clean')
+const hpp = require('hpp')
 
 const AppError = require('./utils/appError')
 const globalErrorHandler = require('./controllers/errorController')
@@ -33,10 +34,24 @@ app.use('/api', limiter)
 app.use(express.json({ limit: '10kb' }))
 
 // Data sanitization against NoSQL query injection
-app.use(mongoSanitize())  // [Moriah] 過濾$等符號
+app.use(mongoSanitize()) // [Moriah] 過濾$等符號
 
 // Data sanitization against XSS
-app.use(xss())  // [Moriah] clean所有用戶輸入的惡意html code
+app.use(xss()) // [Moriah] clean所有用戶輸入的惡意html code
+
+// Prevent parameter pollution
+app.use(
+  hpp({
+    whitelist: [
+      'duration',
+      'ratingsQuantity',
+      'ratingsAverage',
+      'maxGroupSize',
+      'difficulty',
+      'price'
+    ]
+  })
+)
 
 // Serving static files
 app.use(express.static(`${__dirname}/public`))
