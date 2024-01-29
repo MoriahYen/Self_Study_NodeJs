@@ -87,18 +87,18 @@ reviewSchema.post('save', function() {
   // [Moriah] 不能用this.Review.calcAverageRatings，因為Review最後才被create
 })
 
-// // findByIdAndUpdate
-// // findByIdAndDelete
-// reviewSchema.pre(/^findOneAnd/, async function(next) {
-//   this.r = await this.findOne()
-//   // console.log(this.r);
-//   next()
-// })
+// findByIdAndUpdate
+// findByIdAndDelete
+reviewSchema.pre(/^findOneAnd/, async function(next) {
+  this.r = await this.findOne()
+  // console.log(this.r);
+  next()
+})
 
-// reviewSchema.post(/^findOneAnd/, async function() {
-//   // await this.findOne(); does NOT work here, query has already executed
-//   await this.r.constructor.calcAverageRatings(this.r.tour)
-// })
+reviewSchema.post(/^findOneAnd/, async function() {
+  // await this.findOne(); does NOT work here, query has already executed
+  await this.r.constructor.calcAverageRatings(this.r.tour)
+})
 
 const Review = mongoose.model('Review', reviewSchema)
 
