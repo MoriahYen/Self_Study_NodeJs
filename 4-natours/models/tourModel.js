@@ -119,6 +119,11 @@ const tourSchema = new mongoose.Schema(
   }
 )
 
+// tourSchema.index({ price: 1 });
+tourSchema.index({ price: 1, ratingsAverage: -1 })
+tourSchema.index({ slug: 1 })
+// tourSchema.index({ startLocation: '2dsphere' })
+
 // [Moriah] virtual property: 不會永久存在DB
 // 不用箭頭函數，因為箭頭函數不能用this
 tourSchema.virtual('durationWeeks').get(function() {
