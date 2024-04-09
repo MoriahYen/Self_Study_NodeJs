@@ -124,7 +124,7 @@ const tourSchema = new mongoose.Schema(
 // tourSchema.index({ price: 1 });
 tourSchema.index({ price: 1, ratingsAverage: -1 })
 tourSchema.index({ slug: 1 })
-// tourSchema.index({ startLocation: '2dsphere' })
+tourSchema.index({ startLocation: '2dsphere' })
 
 // [Moriah] virtual property: 不會永久存在DB
 // 不用箭頭函數，因為箭頭函數不能用this
@@ -188,12 +188,12 @@ tourSchema.post(/^find/, function(docs, next) {
 })
 
 // AAGREGATION MIDDLEWARE
-tourSchema.pre('aggregate', function(next) {
-  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } })
+// tourSchema.pre('aggregate', function(next) {
+//   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } })
 
-  console.log(this.pipeline())
-  next()
-})
+//   console.log(this.pipeline())
+//   next()
+// })
 
 const Tour = mongoose.model('Tour', tourSchema)
 
