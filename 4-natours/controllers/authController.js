@@ -38,6 +38,7 @@ const createSendToken = (user, statusCode, res) => {
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
+  // const newUser = await User.create(req.body);
   // [Moriah] 這邊有bug, postman不能在body擴充
   const newUser = await User.create({
     name: req.body.name,
@@ -64,6 +65,7 @@ exports.login = catchAsync(async (req, res, next) => {
   const user = await User.findOne({ email }).select('+password');
 
   if (!user || !(await user.correctPassword(password, user.password))) {
+    console.log(user);
     return next(new AppError('Incorrect email or password', 401));
   }
 
@@ -80,6 +82,7 @@ exports.protect = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
+    // [Moriah] Bearer xxxxxxxx
   }
 
   if (!token) {
@@ -90,6 +93,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   // 2) Verification token
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+  // [Moriah] promisify: 來自util，用來返回一個promise
 
   // 3) Check if user still exists
   const currentUser = await User.findById(decoded.id);
@@ -104,6 +108,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   // 4) Check if user changed password after the token was issued
   if (currentUser.changedPasswordAfter(decoded.iat)) {
+    // [Moriaj] issued at
     return next(
       new AppError('User recently changed password! Please log in again.', 401)
     );
@@ -114,10 +119,13 @@ exports.protect = catchAsync(async (req, res, next) => {
   next();
 });
 
+// [Moriah] 一般情況，不能將參數傳遞到middleware function
+// wrapper function / rest 參數語法，將創建一個包含所有指定參數的array
 exports.restrictTo = (...roles) => {
   return (req, res, next) => {
     // roles ['admin', 'lead-guide']. role='user'
     if (!roles.includes(req.user.role)) {
+      // [Moriah] 上面的req.user = currentUser;
       return next(
         new AppError('You do not have permission to perform this action', 403)
       );
@@ -136,6 +144,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 
   // 2) Generate the random reset token
   const resetToken = user.createPasswordResetToken();
+  // [Moriah] 因createPasswordResetToken只改值但未儲存
   await user.save({ validateBeforeSave: false });
 
   // 3) Send it to user's email
@@ -174,6 +183,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     .createHash('sha256')
     .update(req.params.token)
     .digest('hex');
+  // [Moriah] 現在只有token可以辨識user
   const user = await User.findOne({
     passwordResetToken: hashedToken,
     passwordResetExpires: { $gt: Date.now() }
@@ -194,6 +204,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
+  // [Moriah] 更改密碼前要確認舊密碼
   // 1) Get user from collection
   const user = await User.findById(req.user.id).select('+password');
 
@@ -207,6 +218,7 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   user.passwordConfirm = req.body.passwordConfirm;
   await user.save();
   // User.findByIdAndUpdate will NOT work as intended!
+  // [Moriah] 在usermodel中，passwordConfirm的this.password並沒有被保存道內存裡，所以findByIdAndUpdate不會有作用
 
   // 4) Log user in, send JWT
   createSendToken(user, 200, res);

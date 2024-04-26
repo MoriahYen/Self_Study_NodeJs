@@ -32,7 +32,8 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   const filteredBody = filterObj(req.body, 'name', 'email');
 
   // 3) Update user document
-  // [Moriah] findByIdAndUpdate有使用限制
+  // [Moriah] findByIdAndUpdate有使用限制，因為不使用密碼?
+  // 使用filteredBody而非req.body: 不需要更新所有內容
   const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
     new: true,
     runValidators: true

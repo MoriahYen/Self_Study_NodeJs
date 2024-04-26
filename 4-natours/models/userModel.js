@@ -66,7 +66,7 @@ const userSchema = new mongoose.Schema({
 // userSchema.pre('save', function(next) {
 //   if (!this.isModified('password') || this.isNew) return next()
 
-//   // [Moriah] 有時候JWT會在改密碼前先創建，故減1s
+//   // [Moriah] 有時候保存到DB比JWT創造慢，改密碼前的時間戳可能在創建JWT後設置，故減1s。確保JWT在更改密碼後創建
 //   this.passwordChangedAt = Date.now() - 1000
 //   next()
 // })
@@ -90,16 +90,16 @@ userSchema.methods.changedPasswordAfter = function(JWTTimestamp) {
   if (this.passwordChangedAt) {
     const changedTimestamp = parseInt(
       this.passwordChangedAt.getTime() / 1000,
-      10
+      10 // base
     );
     console.log(changedTimestamp, JWTTimestamp);
     return JWTTimestamp < changedTimestamp;
   }
-  return false;
+  return false; // not changed
 };
 
 userSchema.methods.createPasswordResetToken = function() {
-  // [Moriah] resetToken用來發送給用戶，用來重製密碼
+  // [Moriah] resetToken用來發送給用戶，用來重製密碼，只有用戶知道
   const resetToken = crypto.randomBytes(32).toString('hex');
 
   this.passwordResetToken = crypto

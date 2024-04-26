@@ -25,8 +25,8 @@ if (process.env.NODE_ENV === 'development') {
 
 // Limit requests from same API
 const limiter = rateLimit({
-  max: 100, // [Moriah] 1hr from the same ip
-  windowMs: 60 * 60 * 1000,
+  max: 100,
+  windowMs: 60 * 60 * 1000, // [Moriah] 1hr from the same ip
   message: 'Too many requests from this IP, please try again in an hour!'
 });
 app.use('/api', limiter);
@@ -35,15 +35,18 @@ app.use('/api', limiter);
 app.use(express.json({ limit: '10kb' }));
 
 // Data sanitization against NoSQL query injection
-app.use(mongoSanitize()); // [Moriah] 過濾$等符號
+app.use(mongoSanitize());
+// [Moriah] 過濾$等符號，ex: "email": {"gt": ""}
 
 // Data sanitization against XSS
 app.use(xss()); // [Moriah] clean所有用戶輸入的惡意html code
 
 // Prevent parameter pollution
+// [Moriah] 不太懂
 app.use(
   hpp({
     whitelist: [
+      // [Moriah] whitelist: 允許在查詢字串中重複查詢，ex: 兩個duration
       'duration',
       'ratingsQuantity',
       'ratingsAverage',
