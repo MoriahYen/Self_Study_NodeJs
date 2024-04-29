@@ -169,7 +169,7 @@ tourSchema.pre('save', function(next) {
 tourSchema.pre(/^find/, function(next) {
   this.find({ secretTour: { $ne: true } });
 
-  this.strat = Date.now();
+  this.start = Date.now();
   next();
 });
 
@@ -183,11 +183,11 @@ tourSchema.pre(/^find/, function(next) {
 });
 
 tourSchema.post(/^find/, function(docs, next) {
-  console.log(`Query took ${Date.now() - this.strat} milliseconds`);
+  console.log(`Query took ${Date.now() - this.start} milliseconds!`);
   next();
 });
 
-// AAGREGATION MIDDLEWARE
+// AGGREGATION MIDDLEWARE
 // tourSchema.pre('aggregate', function(next) {
 //   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } })
 

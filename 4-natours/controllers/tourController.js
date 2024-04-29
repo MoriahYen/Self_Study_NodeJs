@@ -81,7 +81,9 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
       $addFields: { month: '$_id' }
     },
     {
-      $project: { _id: 0 }
+      $project: {
+        _id: 0
+      }
     },
     {
       $sort: { numTourStarts: -1 }

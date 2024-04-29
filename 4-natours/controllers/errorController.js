@@ -21,6 +21,12 @@ const handleValidationErrorDB = err => {
   return new AppError(message, 400);
 };
 
+const handleJWTError = () =>
+  new AppError('Invalid token. Please log in again!', 401);
+
+const handleJWTExpiredError = () =>
+  new AppError('Your token has expired! Please log in again.', 401);
+
 const sendErrorDev = (err, res) => {
   res.status(err.statusCode).json({
     status: err.status,
@@ -29,12 +35,6 @@ const sendErrorDev = (err, res) => {
     stack: err.stack
   });
 };
-
-const handleJWTError = () =>
-  new AppError('Invalid token. Please log in again!', 401);
-
-const handleJWTExpiredError = () =>
-  new AppError('Your token has expired! Please log in again.', 401);
 
 const sendErrorProd = (err, res) => {
   // Operational, trusted error: send message to client
@@ -47,7 +47,7 @@ const sendErrorProd = (err, res) => {
     // Programming or other unknown error: don't leak error details
   } else {
     // 1) Log error
-    console.error('ERROR', err);
+    console.error('ERROR 💥', err);
 
     // 2) Send generic message
     res.status(500).json({
