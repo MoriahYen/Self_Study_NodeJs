@@ -36,7 +36,7 @@ const getDogPic = async () => {
     );
     console.log(res.body.message);
 
-    // // [Moriah] 不使用async
+    // [Moriah] 不使用async
     // const res1Pro = superagent.get(
     //   `https://dog.ceo/api/breed/${data}/images/random`
     // );
@@ -56,23 +56,32 @@ const getDogPic = async () => {
   } catch (err) {
     console.log(err);
 
-    // throw err; //[Moriah] 拋出錯誤，promise才會顯示reject，否則是success
+    throw err;
+    //[Moriah] 拋出錯誤，promise才會顯示reject，否則在then接收都是success
   }
-  // return '2: READY 🐶';
+  return '2: READY 🐶';
 };
 
-getDogPic();
+(async () => {
+  try {
+    console.log('1: Will get dog pics!');
+    const x = await getDogPic();
+    console.log(x);
+    console.log('3: Done getting dog pics!');
+  } catch (err) {
+    console.log('ERROR 💥');
+  }
+})();
 
-// (async () => {
-//   try {
-//     console.log('1: Will get dog pics!');
-//     const x = await getDogPic();
+// console.log('1: Will get dog pics!');
+// getDogPic()
+//   .then(x => {
 //     console.log(x);
 //     console.log('3: Done getting dog pics!');
-//   } catch (err) {
+//   })
+//   .catch(err => {
 //     console.log('ERROR 💥');
-//   }
-// })();
+//   });
 
 // [Moriah] 連接所有的then就是利用promise
 // readFilePro(`${__dirname}/dog.txt`)
@@ -93,14 +102,4 @@ getDogPic();
 //   })
 //   .catch((err) => {
 //     console.log(err);
-//   });
-
-// console.log('1: Will get dog pics!');
-// getDogPic()
-//   .then(x => {
-//     console.log(x);
-//     console.log('3: Done getting dog pics!');
-//   })
-//   .catch(err => {
-//     console.log('ERROR 💥');
 //   });
