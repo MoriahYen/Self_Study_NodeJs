@@ -1,66 +1,49 @@
 const fs = require('fs');
 const superagent = require('superagent');
 
-// [Moriah] callback hell
-fs.readFile(`${__dirname}/dog.txt`, (err, data) => {
-  console.log(`Breed: ${data}`);
+// [Moriah] 解決callback hell是用promise?
 
-  // [Moriah] then: 在promise完成工作並返回數據時被調用，
-  // 否則原本的.get()已經返回一個promise(pending)，但沒被調用(resolved)
-  superagent
-    .get(`https://dog.ceo/api/breed/${data}/images/random`)
-    .then((res) => {
-      console.log(res.body.message);
-
-      fs.writeFile('dog-img.txt', res.body.message, (err) => {
-        if (err) return console.log(err.message);
-        console.log('Random dog image saved to file!');
-      });
-    })
-    .catch((err) => {
-      console.log(err.message);
+const readFilePro = (file) => {
+  // [Moriah] 這個promise constructor接受了一個executor函數，
+  // 當promise創建時會立刻被調用，
+  // 此函數接受兩個參數(resolve, reject)
+  return new Promise((resolve, reject) => {
+    fs.readFile(file, (err, data) => {
+      if (err) reject('I could not find that file 😢');
+      resolve(data);
     });
-});
+  });
+};
 
-// const readFilePro = (file) => {
-//   return new Promise((resolve, reject) => {
-//     fs.readFile(file, (err, data) => {
-//       if (err) reject('I could not find that file 😢');
-//       resolve(data);
-//     });
-//   });
-// };
+const writeFilePro = (file, data) => {
+  return new Promise((resolve, reject) => {
+    fs.writeFile(file, data, (err) => {
+      if (err) reject('Could not write file.');
+      resolve('success');
+    });
+  });
+};
 
-// const writeFilePro = (file, data) => {
-//   return new Promise((resolve, reject) => {
-//     fs.writeFile(file, data, (err) => {
-//       if (err) reject('Could not write file.');
-//       resolve('sucess');
-//     });
-//   });
-// };
-
-/*
+// [Moriah] 連接所有的then就是利用promise
 readFilePro(`${__dirname}/dog.txt`)
-  .then(data => {
-    console.log(`Breed: ${data}`)
-    return superagent.get(`https://dog.ceo/api/breed/${data}/images/random`) // [Moriah] get會return一個promise
+  .then((data) => {
+    console.log(`Breed: ${data}`);
+
+    // [Moriah] then: 在promise完成工作並返回數據時被調用，
+    // 否則原本的.get()已經返回一個promise(pending)，但沒被調用(resolved)
+    return superagent.get(`https://dog.ceo/api/breed/${data}/images/random`);
   })
-  .then(res => {
-    console.log(res.body.message)
-    return writeFilePro('dog-img.txt', res.body.message)
-    // fs.writeFile('dog-img.txt', res.body.message, err => {
-    //   if (err) return console.log(err.message)
-    //   console.log('Random dog image saved to file!')
-    //  })
+  .then((res) => {
+    console.log(res.body.message);
+
+    return writeFilePro('dog-img.txt', res.body.message);
   })
   .then(() => {
-    console.log('Random dog image saved to file!')
+    console.log('Random dog image saved to file!');
   })
-  .catch(err => {
-    console.log(err)
-  })
-*/
+  .catch((err) => {
+    console.log(err);
+  });
 
 // [Moriah] async會返回一個promise
 // const getDogPic = async () => {
