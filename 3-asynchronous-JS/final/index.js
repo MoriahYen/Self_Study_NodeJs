@@ -24,57 +24,44 @@ const writeFilePro = (file, data) => {
   });
 };
 
-// [Moriah] 連接所有的then就是利用promise
-readFilePro(`${__dirname}/dog.txt`)
-  .then((data) => {
+// [Moriah] async會返回一個promise
+// async: 一個在執行其中的代碼時保持後台運行的代碼，而其餘的代碼在event loop中運行
+const getDogPic = async () => {
+  try {
+    const data = await readFilePro(`${__dirname}/dog.txt`);
     console.log(`Breed: ${data}`);
 
-    // [Moriah] then: 在promise完成工作並返回數據時被調用，
-    // 否則原本的.get()已經返回一個promise(pending)，但沒被調用(resolved)
-    return superagent.get(`https://dog.ceo/api/breed/${data}/images/random`);
-  })
-  .then((res) => {
+    const res = await superagent.get(
+      `https://dog.ceo/api/breed/${data}/images/random`
+    );
     console.log(res.body.message);
 
-    return writeFilePro('dog-img.txt', res.body.message);
-  })
-  .then(() => {
+    // // [Moriah] 不使用async
+    // const res1Pro = superagent.get(
+    //   `https://dog.ceo/api/breed/${data}/images/random`
+    // );
+    // const res2Pro = superagent.get(
+    //   `https://dog.ceo/api/breed/${data}/images/random`
+    // );
+    // const res3Pro = superagent.get(
+    //   `https://dog.ceo/api/breed/${data}/images/random`
+    // );
+    // // [Moriah] 三個resxPro會同時進行
+    // const all = await Promise.all([res1Pro, res2Pro, res3Pro]);
+    // const imgs = all.map((el) => el.body.message);
+    // console.log(imgs);
+
+    await writeFilePro('dog-img.txt', res.body.message);
     console.log('Random dog image saved to file!');
-  })
-  .catch((err) => {
+  } catch (err) {
     console.log(err);
-  });
 
-// [Moriah] async會返回一個promise
-// const getDogPic = async () => {
-//   try {
-//     const data = await readFilePro(`${__dirname}/dog.txt`);
-//     console.log(`Breed: ${data}`);
+    // throw err; //[Moriah] 拋出錯誤，promise才會顯示reject，否則是success
+  }
+  // return '2: READY 🐶';
+};
 
-//     // [Moriah] 不使用async
-//     const res1Pro = superagent.get(
-//       `https://dog.ceo/api/breed/${data}/images/random`
-//     );
-//     const res2Pro = superagent.get(
-//       `https://dog.ceo/api/breed/${data}/images/random`
-//     );
-//     const res3Pro = superagent.get(
-//       `https://dog.ceo/api/breed/${data}/images/random`
-//     );
-//     // [Moriah] 三個resxPro會同時進行
-//     const all = await Promise.all([res1Pro, res2Pro, res3Pro]);
-//     const imgs = all.map((el) => el.body.message);
-//     console.log(imgs);
-
-//     await writeFilePro('dog-img.txt', imgs.join('\n'));
-//     console.log('Random dog image saved to file!');
-//   } catch (err) {
-//     console.log(err);
-
-//     throw err; //[Moriah] 拋出錯誤，promise才會顯示reject，否則是success
-//   }
-//   return '2: READY 🐶';
-// };
+getDogPic();
 
 // (async () => {
 //   try {
@@ -87,32 +74,33 @@ readFilePro(`${__dirname}/dog.txt`)
 //   }
 // })();
 
-/*
-readFilePro(`${__dirname}/dog.txt`)
-  .then(data => {
-    console.log(`Breed: ${data}`);
-    return superagent.get(`https://dog.ceo/api/breed/${data}/images/random`);
-  })
-  .then(res => {
-    console.log(res.body.message);
-    return writeFilePro('dog-img.txt', res.body.message);
-  })
-  .then(() => {
-    console.log('Random dog image saved to file!');
-  })
-  .catch(err => {
-    console.log(err);
-  });
-*/
+// [Moriah] 連接所有的then就是利用promise
+// readFilePro(`${__dirname}/dog.txt`)
+//   .then((data) => {
+//     console.log(`Breed: ${data}`);
 
-/*
-console.log('1: Will get dog pics!');
-getDogPic()
-  .then(x => {
-    console.log(x);
-    console.log('3: Done getting dog pics!');
-  })
-  .catch(err => {
-    console.log('ERROR 💥');
-  });
-*/
+//     // [Moriah] then: 在promise完成工作並返回數據時被調用，
+//     // 否則原本的.get()已經返回一個promise(pending)，但沒被調用(resolved)
+//     return superagent.get(`https://dog.ceo/api/breed/${data}/images/random`);
+//   })
+//   .then((res) => {
+//     console.log(res.body.message);
+
+//     return writeFilePro('dog-img.txt', res.body.message);
+//   })
+//   .then(() => {
+//     console.log('Random dog image saved to file!');
+//   })
+//   .catch((err) => {
+//     console.log(err);
+//   });
+
+// console.log('1: Will get dog pics!');
+// getDogPic()
+//   .then(x => {
+//     console.log(x);
+//     console.log('3: Done getting dog pics!');
+//   })
+//   .catch(err => {
+//     console.log('ERROR 💥');
+//   });
