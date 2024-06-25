@@ -72,6 +72,15 @@ exports.login = catchAsync(async (req, res, next) => {
   createSendToken(user, 200, res);
 });
 
+exports.logout = (req, res) => {
+  res.cookie('jwt', 'loggedout', {
+    // [Moriah] jwt會覆蓋相同名稱的token
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true
+  });
+  res.status(200).json({ status: 'success' });
+};
+
 // [Moriah] 保護路由免受未經授權的訪問
 exports.protect = catchAsync(async (req, res, next) => {
   // 1) Getting token and check of it's there
@@ -121,6 +130,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 });
 
 // Only for rendered pages, ***no errors!***
+// [Moriah] 不用catchAsync，因為沒有要catch error
 exports.isLoggedIn = async (req, res, next) => {
   if (req.cookies.jwt) {
     try {

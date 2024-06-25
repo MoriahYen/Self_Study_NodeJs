@@ -1,7 +1,8 @@
 /* eslint-disable */
 import axios from 'axios';
 import { showAlert } from './alerts';
-const login = async (email, password) => {
+
+export const login = async (email, password) => {
   try {
     const res = await axios({
       method: 'POST',
@@ -20,26 +21,21 @@ const login = async (email, password) => {
     }
   } catch (err) {
     console.log(err);
-    //showAlert('error', err.response.data.message);
+    showAlert('error', err.response.data.message);
   }
 };
 
-document.querySelector('.form').addEventListener('submit', e => {
-  e.preventDefault();
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
-  login(email, password);
-});
-
-// export const logout = async () => {
-//   try {
-//     const res = await axios({
-//       method: 'GET',
-//       url: 'http://127.0.0.1:3000/api/v1/users/logout'
-//     });
-//     if ((res.data.status = 'success')) location.reload(true);
-//   } catch (err) {
-//     console.log(err.response);
-//     showAlert('error', 'Error logging out! Try again.');
-//   }
-// };
+export const logout = async () => {
+  try {
+    const res = await axios({
+      method: 'GET',
+      url: 'http://127.0.0.1:3000/api/v1/users/logout'
+    });
+    if ((res.data.status = 'success')) location.reload(true);
+    // [Moriah] reload page, 將無效的cookie發送到server
+    // reload(true)是強制重載，不是從cache load
+  } catch (err) {
+    console.log(err.response);
+    showAlert('error', 'Error logging out! Try again.');
+  }
+};
