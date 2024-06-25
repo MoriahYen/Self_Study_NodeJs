@@ -20,7 +20,7 @@ router
   .route('/monthly-plan/:year')
   .get(
     authController.protect,
-    authController.restrictTo('admin', 'lead-quide', 'guide'),
+    authController.restrictTo('admin', 'lead-guide', 'guide'),
     tourController.getMonthlyPlan
   );
 
@@ -46,12 +46,12 @@ router
   .get(tourController.getTour)
   .patch(
     authController.protect,
-    authController.restrictTo('admin', 'lead-quide'),
+    authController.restrictTo('admin', 'lead-guide'),
     tourController.updateTour
   )
   .delete(
     authController.protect,
-    authController.restrictTo('admin', 'lead-quide'),
+    authController.restrictTo('admin', 'lead-guide'),
     tourController.deleteTour
   );
 
