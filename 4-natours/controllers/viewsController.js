@@ -40,11 +40,11 @@ exports.getLoginForm = (req, res) => {
   });
 };
 
-// exports.getAccount = (req, res) => {
-//   res.status(200).render('account', {
-//     title: 'Your account'
-//   });
-// };
+exports.getAccount = (req, res) => {
+  res.status(200).render('account', {
+    title: 'Your account'
+  });
+};
 
 // exports.updateUserData = catchAsync(async (req, res, next) => {
 //   const updatedUser = await User.findByIdAndUpdate(
